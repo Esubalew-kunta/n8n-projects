@@ -1,0 +1,66 @@
+{
+  "name": "Monitoring_Dashboard",
+  "nodes": [
+    {
+      "parameters": {
+        "event": "workflow_finished"
+      },
+      "id": "m1n1t1o1-r1i1-n1g1-d1a1-s1h1b1o1a1r1",
+      "name": "On Workflow Finished",
+      "type": "n8n-nodes-base.workflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "table": "analytics",
+        "columns": [
+          "workflow_run_id",
+          "workflow_name",
+          "status",
+          "error_node",
+          "error_message",
+          "execution_time_ms"
+        ],
+        "options": {}
+      },
+      "id": "a1n1a1l1-y1t1-i1c1-s1l1-o1g1g1e1r1",
+      "name": "Log to Supabase Analytics",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-credential-id",
+          "name": "Supabase"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "On Workflow Finished": {
+      "main": [
+        [
+          {
+            "node": "Log to Supabase Analytics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {},
+  "staticData": null,
+  "meta": {
+    "templateId": "aura-engine-monitoring"
+  },
+  "pinData": {}
+}

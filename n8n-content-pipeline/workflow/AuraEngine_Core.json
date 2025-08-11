@@ -1,0 +1,391 @@
+{
+  "name": "AuraEngine_Core",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "aura-engine-trigger",
+        "options": {}
+      },
+      "id": "t1r1i1g1-g1e1-r1n1-o1d1-e1",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        0,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.product_url || $json.body.product_url }}",
+        "options": {}
+      },
+      "id": "s1c1r1a1-p1e1-r1h1-t1t1-p1",
+      "name": "Scrape Product Page",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "extractHtml",
+        "extractionRules": {
+          "values": [
+            {
+              "key": "page_text",
+              "cssSelector": "body",
+              "returnValue": "text"
+            }
+          ]
+        }
+      },
+      "id": "e1x1t1r1-a1c1-t1o1-r1",
+      "name": "HTML Extractor",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1,
+      "position": [
+        400,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"llama-3.3-70b-versatile\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": {{ JSON.stringify(\"Analyze this product data and identify 3 USPs: \" + ($json.page_text || \"No text found\")) }}\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "a1g1e1n1-t1r1-e1s1-e1a1-r1c1",
+      "name": "Researcher Agent (Groq)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        600,
+        200
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "groq-api-key",
+          "name": "Groq API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"llama-3.3-70b-versatile\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": {{ JSON.stringify(\"Generate TikTok hooks, a script, and a LinkedIn post based on this research: \" + ($node[\\\"Researcher Agent (Groq)\\\"].json.choices[0].message.content || \"No research found\")) }}\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "a1g1e1n1-t1c1-o1p1-y1w1-r1i1",
+      "name": "Copywriter Agent (Groq)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        850,
+        200
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "groq-api-key",
+          "name": "Groq API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"llama-3.3-70b-versatile\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": {{ JSON.stringify(\"Generate a high-quality image prompt for Pollinations.ai based on this product data: \" + ($node[\\\"HTML Extractor\\\"].json.page_text || \"No data found\")) }}\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "a1g1e1n1-t1c1-r1e1-a1t1-i1v1",
+      "name": "Creative Director Agent (Groq)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        850,
+        400
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "groq-api-key",
+          "name": "Groq API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": "Media_Gen_Subprocess",
+        "options": {}
+      },
+      "id": "s1u1b1w1-o1r1-k1f1-l1o1-w1",
+      "name": "Trigger Media Pipeline",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "=New Content Ready for Approval!\n\nResearch: {{ $node[\"Researcher Agent (Groq)\"].json.choices[0].message.content.substring(0, 500) }}...\n\nScript: {{ $node[\"Copywriter Agent (Groq)\"].json.choices[0].message.content }}\n\nApprove?",
+        "replyMarkup": "inline_keyboard",
+        "inlineKeyboard": [
+          [
+            {
+              "text": "✅ Approve",
+              "callback_data": "approve"
+            },
+            {
+              "text": "🔄 Regenerate",
+              "callback_data": "regenerate"
+            },
+            {
+              "text": "❌ Reject",
+              "callback_data": "reject"
+            }
+          ]
+        ]
+      },
+      "id": "t1e1l1e1-g1r1-a1m1-h1i1-t1l1",
+      "name": "HITL Approval Request",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1350,
+        300
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram-bot-id",
+          "name": "AuraEngine Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "webhookPath": "aura-approval",
+        "options": {}
+      },
+      "id": "w1a1i1t1-f1o1-r1-a1p1-p1r1-o1v1-a1l1",
+      "name": "Wait for Approval",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        1550,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.query.callback_data }}",
+              "value2": "approve"
+            }
+          ]
+        }
+      },
+      "id": "i1f1-a1p1-p1r1-o1v1-e1d1",
+      "name": "If Approved",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1750,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "CHANNEL_ID",
+        "text": "={{ $node[\"Copywriter Agent (Groq)\"].json.choices[0].message.content }}",
+        "options": {}
+      },
+      "id": "d1i1s1p1-a1t1-c1h1-t1e1-l1e1",
+      "name": "Post to Telegram Channel",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        200
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram-bot-id",
+          "name": "AuraEngine Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "table": "distribution_queue",
+        "columns": [
+          "content_id",
+          "channel",
+          "status"
+        ],
+        "options": {}
+      },
+      "id": "s1u1p1a1-b1a1-s1e1-u1p1d1a1t1e1",
+      "name": "Update Queue Status",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        400
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-credential-id",
+          "name": "Supabase"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Scrape Product Page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape Product Page": {
+      "main": [
+        [
+          {
+            "node": "HTML Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML Extractor": {
+      "main": [
+        [
+          {
+            "node": "Researcher Agent (Groq)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Creative Director Agent (Groq)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Researcher Agent (Groq)": {
+      "main": [
+        [
+          {
+            "node": "Copywriter Agent (Groq)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copywriter Agent (Groq)": {
+      "main": [
+        [
+          {
+            "node": "Trigger Media Pipeline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Creative Director Agent (Groq)": {
+      "main": [
+        [
+          {
+            "node": "Trigger Media Pipeline",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Trigger Media Pipeline": {
+      "main": [
+        [
+          {
+            "node": "HITL Approval Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HITL Approval Request": {
+      "main": [
+        [
+          {
+            "node": "Wait for Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Approval": {
+      "main": [
+        [
+          {
+            "node": "If Approved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Approved": {
+      "main": [
+        [
+          {
+            "node": "Post to Telegram Channel",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Queue Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {},
+  "staticData": null,
+  "meta": {
+    "templateId": "aura-engine-core"
+  },
+  "pinData": {}
+}
