@@ -1,0 +1,42 @@
+{
+  "name": "Global Error Handler",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [0, 0],
+      "id": "error-trigger-id",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_ADMIN_CHAT_ID",
+        "text": "=🚨 <b>Workflow Error!</b>\n\n<b>Workflow:</b> {{$json.workflow.name}}\n<b>Node:</b> {{$json.execution.lastNodeExecuted}}\n<b>Error:</b> {{$json.execution.error.message}}\n<a href=\"{{$json.execution.url}}\">View Execution</a>",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [220, 0],
+      "id": "telegram-error-notification",
+      "name": "Send Error Alert via Telegram",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          { "node": "Send Error Alert via Telegram", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  }
+}

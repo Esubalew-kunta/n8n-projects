@@ -1,0 +1,82 @@
+{
+  "name": "TikTok Daily Digest",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            { "triggerAtHour": 9 }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [0, 0],
+      "id": "schedule-trigger-id",
+      "name": "Daily Trigger (8-9 AM)"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "value": "YOUR_GOOGLE_SHEET_ID"
+        },
+        "sheetName": {
+          "value": "Sheet1"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "Draft"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [208, 0],
+      "id": "get-draft-products-id",
+      "name": "Get Draft Products",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_CREDENTIAL_ID",
+          "name": "Google Sheets Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "🎯 Your Daily TikTok Content Ideas!\n\n📦 Product: {{ $json['Product Name'] }}\n💰 Price: {{ $json['Price'] }}\n\n🪝 Hook 1: {{ $json['Hook 1'] }}\n🪝 Hook 2: {{ $json['Hook 2'] }}\n🪝 Hook 3: {{ $json['Hook 3'] }}\n\n🎬 Script: {{ $json['Script'] }}\n\n📝 Caption: {{ $json['Caption'] }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [416, 0],
+      "id": "send-telegram-id",
+      "name": "Send Daily Content",
+      "webhookId": "YOUR_WEBHOOK_ID",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Daily Trigger (8-9 AM)": {
+      "main": [
+        [
+          { "node": "Get Draft Products", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Get Draft Products": {
+      "main": [
+        [
+          { "node": "Send Daily Content", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  }
+}
