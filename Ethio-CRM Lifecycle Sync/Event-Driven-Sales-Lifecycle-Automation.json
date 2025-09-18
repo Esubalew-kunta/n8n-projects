@@ -1,0 +1,595 @@
+{
+  "name": "Event-Driven Sales Lifecycle Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "SIGNUP\n\nFlow:\nContact gets \"signup\" tag → Go High Level webhook fires → n8n receives data → Code node processes → Supabase creates row\nPurpose: Auto-captures GHL \"signup\" tags → processes lead data → stores in Supabase database\n",
+        "height": 240,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "da2e1db0-79ee-4dd7-84e5-1b3f0485850c",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "tableId": "CUSTOMERS",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "full_name",
+              "fieldValue": "={{ $json.body.full_name }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $json.body.email }}"
+            },
+            {
+              "fieldId": "signup_date_created",
+              "fieldValue": "={{ $json.body.date_created }}"
+            },
+            {
+              "fieldId": "Business Industry",
+              "fieldValue": "={{ $json.body[\"Business Industry\"] }}"
+            },
+            {
+              "fieldId": "first_name",
+              "fieldValue": "={{ $json.body.first_name }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1088,
+        48
+      ],
+      "id": "e83f09a4-58ab-4d5b-9dea-7536f933ee1f",
+      "name": "Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Returns a copy of the object by removing:\n// - null, undefined\n// - empty strings \"\"\n// - empty objects/arrays after cleaning\nfunction clean(value) {\n  if (Array.isArray(value)) {\n    const arr = value.map(clean)\n      .filter(v => !(v == null || v === \"\" ||\n                     (Array.isArray(v) && v.length === 0) ||\n                     (typeof v === \"object\" && !Array.isArray(v) && Object.keys(v).length === 0)));\n    return arr;\n  }\n\n  if (value && typeof value === \"object\") {\n    const out = {};\n    for (const [k, v] of Object.entries(value)) {\n      const vv = clean(v);\n      const isEmptyObj = vv && typeof vv === \"object\" && !Array.isArray(vv) && Object.keys(vv).length === 0;\n      const isEmptyArr = Array.isArray(vv) && vv.length === 0;\n      if (!(vv == null || vv === \"\" || isEmptyObj || isEmptyArr)) {\n        out[k] = vv;\n      }\n    }\n    return out;\n  }\n\n// numbers 0 and boolean false are considered valid\n  return value;\n}\n\nreturn items.map(item => {\n  const cleaned = clean(item.json);   // the Webhook leaves the body in item.json\n  return { json: cleaned };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        768,
+        48
+      ],
+      "id": "be505d6f-a0fa-4bb0-a3bc-a742468c9e7c",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "content": "APPOINTMENT BOOKED\n\nFlow:\nContact gets \"appointment booked\" → Go High Level webhook fires → n8n receives data → Set node processes → Supabase updates row\nPurpose: Auto-captures GHL \"appointment booked\" → processes lead data → stores in Supabase database\n",
+        "height": 240,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        272
+      ],
+      "typeVersion": 1,
+      "id": "15bc1f3d-b914-4b85-87ff-dd125ee64a79",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        368,
+        272
+      ],
+      "id": "0cc97cfa-7c08-4666-ab14-4e9428742ae1",
+      "name": "Webhook Appointment Booked",
+      "webhookId": ""
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        368,
+        48
+      ],
+      "id": "5e719f24-e5a6-4542-ab91-fa8ff0f81995",
+      "name": "Webhook Signup",
+      "webhookId": ""
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "CUSTOMERS",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "condition": "eq",
+              "keyValue": "={{ $json.email }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "appointment_booked_date",
+              "fieldValue": "={{ $json.appointment_booked_date }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1088,
+        272
+      ],
+      "id": "7f417854-5db0-4194-adf7-1be7273ce0f0",
+      "name": "Supabase1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9d9e7ba4-98a9-4c0e-8034-8425fe7d4497",
+              "name": "email",
+              "value": "={{ $json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "2f94c7d3-cf47-4782-b52a-8af3dc721e48",
+              "name": "appointment_booked_date",
+              "value": "={{ $json.body.date_created }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        768,
+        272
+      ],
+      "id": "78a99195-2d91-4330-8ef1-80d23756ee30",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        384,
+        544
+      ],
+      "id": "83232936-e885-4d4c-90ac-9b34066722af",
+      "name": "Webhook Appointment Status",
+      "webhookId": ""
+    },
+    {
+      "parameters": {
+        "content": "APPOINTMENT STATUS\n\nThe workflow will automatically fire whenever an appointment status changes to:\n\nConfirmed\nShowed\nNo-show\nCancelled\nRescheduled",
+        "height": 220,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        528
+      ],
+      "typeVersion": 1,
+      "id": "c119accb-d089-4ddf-943d-7bb52b121efb",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "de4f254f-57d6-45bb-b234-eb9e0b51615d",
+              "name": "email",
+              "value": "={{ $json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "59cc316c-49f7-47fb-863e-b65c49e64723",
+              "name": "appointment_status",
+              "value": "={{ $json.body.calendar.appoinmentStatus }}",
+              "type": "string"
+            },
+            {
+              "id": "f2981d5e-38b0-4cb7-97f3-406580b5cf01",
+              "name": "appointment_status_date_created",
+              "value": "={{ $json.body.calendar.date_created }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        768,
+        544
+      ],
+      "id": "f4db71a6-68a8-4ec9-a46d-1ed3613f3e3b",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "CUSTOMERS",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "condition": "eq",
+              "keyValue": "={{ $json.email }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "appointment_status",
+              "fieldValue": "={{ $json.appointment_status }}"
+            },
+            {
+              "fieldId": "appointment_status_date_created",
+              "fieldValue": "={{ $json.appointment_status_date_created }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1088,
+        544
+      ],
+      "id": "34091220-8c98-4e20-a558-434e90e3d80e",
+      "name": "Supabase2",
+      "credentials": {
+        "supabaseApi": {
+          "id": "",
+          "name": "Supabase account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "PAYMENT\n\nFlow:\nContact gets \"invoice_payment_succeeded\" tag → Go High Level webhook fires → n8n receives data → Code node processes → Supabase updates purchase fields\nPurpose: Auto-captures successful payments → stores purchase confirmation in database\nCompletes customer journey tracking: signup → appointment → purchase.",
+        "height": 340,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        784
+      ],
+      "typeVersion": 1,
+      "id": "80a1b128-2bf3-4e9a-ac96-d9df3c134cad",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        1552,
+        160
+      ],
+      "id": "b6c46d7f-2a28-459b-9475-0a53cc06185d",
+      "name": "When chat message received",
+      "webhookId": ""
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You are a reporting assistant for Ethiopian businesses. Your job is to generate clear and structured sales journey reports based on the company database.\n\nThe database includes these key fields:\n\nSignups: full_name, email, business_industry, signup_date_created\n\nAppointments: appointment_booked_date, appointment_status (confirmed, no show, show), appointment_status_date_created\n\nSales/Purchases: purchase_status (purchased, not purchased), purchase_date\n\nInstructions\n\nWhen asked about a person (e.g., “Abebe”), retrieve their signup date, appointment booking date, appointment status updates (confirmed/no show/show), and purchase status.\n\nShow the timeline in chronological order. All times should be evaluated considering East Africa Time (EAT).\n\nIf a field is missing (NULL), state clearly: “No data recorded”.\n\nAllow filtering by:\n\nIndividual: “Show me Abebe’s journey”\n\nCompany/Industry: “Show me all in Coffee Export”\n\nStatus: “Show me all confirmed appointments this week”\n\nOutcome: “Show me all who purchased after showing up”\n\nOutput should always be easy-to-read, either as a table or bullet points.\n\nExample Query and Output\n\nUser asks: “Show me Abebe’s journey.”\n\nAgent Output:\n\nName: Abebe Kebede\n\nEmail: abebe@ethiopiancoffee.com\n\nBusiness Industry: Coffee Export\n\nSignup Date: Sept 3, 2025, 10:02 EAT\n\nAppointment Booked: Sept 4, 2025, 14:00 EAT\n\nAppointment Status: Confirmed → Showed (Sept 5, 2025)\n\nPurchase: Purchased on Sept 6, 2025"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        1808,
+        160
+      ],
+      "id": "66c713cf-87f3-4d02-919f-a1141ba9b93e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1648,
+        448
+      ],
+      "id": "9e0cc19d-eae2-474e-82c6-66c87fdfed0c",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        1904,
+        448
+      ],
+      "id": "6758f2a7-b766-4f21-bd10-21d17377895d",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "",
+          "name": "Postgres account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "CUSTOMERS"
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        2112,
+        448
+      ],
+      "id": "285a13da-fadb-4814-8752-66a7c8dd0f03",
+      "name": "Supabase3",
+      "credentials": {
+        "supabaseApi": {
+          "id": "",
+          "name": "Supabase account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        384,
+        864
+      ],
+      "id": "7e79ed3a-fd31-4e9a-a727-dedd7a3ed631",
+      "name": "Webhook Payment",
+      "webhookId": ""
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        768,
+        864
+      ],
+      "id": "7267c1f1-2224-43ad-8101-6f138d95d228",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "CUSTOMERS"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1088,
+        864
+      ],
+      "id": "c271484d-b0e6-4ee3-a27d-857ac93e2269",
+      "name": "Update a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "",
+          "name": "Supabase account 3"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Signup": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Appointment Booked": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Supabase1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Appointment Status": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Supabase2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase3": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Payment": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": ""
+  },
+  "id": "",
+  "tags": []
+}
