@@ -1,0 +1,17 @@
+{
+  "name": "n8n-catalog-automation-engine",
+  "version": "1.0.0",
+  "description": "An automated product scraping and creation workflow built by an n8n expert from Ethiopia.",
+  "author": "Esubalew",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^4.21.2",
+    "puppeteer-core": "^21.11.0",
+    "sharp": "^0.34.3"
+  }
+}
