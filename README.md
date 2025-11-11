@@ -24,7 +24,7 @@ Every project in this repository solves a *real business problem* — from an au
 | 1 | [Sentinel: Autonomous Multi-Agent RAG Engine](#1--sentinel-autonomous-multi-agent-rag-engine) | AI Agents, LangChain, Vector Stores, Supervisor Routing |
 | 2 | [Ethio-CRM Lifecycle Sync](#2--ethio-crm-lifecycle-sync) | GoHighLevel Webhooks, Supabase, AI Agent, Event-Driven Design |
 | 3 | [n8n Catalog Automation Engine](#3--n8n-catalog-automation-engine) | Web Scraping, Puppeteer, Shopify API, ETL Pipelines |
-| 4 | [n8n Content Pipeline](#4--n8n-content-pipeline) | Telegram Bot, Groq (Llama 3), Supabase, Multi-Workflow Orchestration |
+| 4 | [AuraEngine: Omni-Channel Autonomous Content Factory](#4--auraengine-omni-channel-autonomous-content-factory) | Telegram Bot, Groq (Llama 3), Supabase, Multi-Workflow Orchestration |
 
 ---
 
