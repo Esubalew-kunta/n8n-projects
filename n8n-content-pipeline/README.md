@@ -97,7 +97,15 @@ analytics (id, workflow_run_id, status, error_message,
            api_calls_made, cost_estimate, created_at)
 ```
 
-> See `supabase/schema.sql` for the full DDL.
+> See `supabase/schema.sql` for the full DDL and RLS policies.
+
+---
+
+## Security & Reliability (Enterprise Features)
+
+- **Row Level Security (RLS)**: Implemented strict Supabase RLS policies. Only the n8n service account (via authenticated service key) can insert logs and content, while preventing unauthorized public access to internal analytics.
+- **Automated UUID Generation**: All primary keys (`id`, `content_id`) use `gen_random_uuid()` at the database level. This ensures absolute data integrity and prevents ID collisions across distributed workflow runs.
+- **Self-Healing Webhooks**: The HITL (Human-in-the-Loop) system utilizes n8n's dynamic `$execution.resumeUrl` with signed signatures, ensuring that only the authorized administrator can trigger the approval via the secure Telegram link.
 
 ---
 
