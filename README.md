@@ -118,38 +118,33 @@ Most n8n developers use only built-in nodes. This project shows the ability to *
 
 ---
 
-## 4. 📱 n8n Content Pipeline
+## 4. 📱 AuraEngine: Omni-Channel Autonomous Content Factory
 
 **`/n8n-content-pipeline`**
 
-> *"A Telegram-native AI content assistant that turns a product name into a full TikTok campaign — hooks, scripts, captions, hashtags — in seconds, and logs everything automatically."*
+> *"An enterprise-grade, multi-agent AI automation system that turns a product URL into a full media campaign — including AI images, voiceovers, and multi-channel distribution — with a secure human-in-the-loop approval gate."*
 
-A two-workflow n8n automation system designed for TikTok affiliates. Built around a Telegram bot interface, it eliminates the manual work of content ideation and data entry.
+AuraEngine is a sophisticated, three-workflow system that transforms raw product data into high-conversion marketing assets. It represents the pinnacle of n8n orchestration, combining relational databases, multi-agent AI, and real-time approval interfaces.
 
 ### What It Does
 
-**Workflow 1 — Input Bot (Real-Time):**
-1. User sends a product via Telegram (e.g., `/new traditional jebena coffee pot 500 birr`)
-2. n8n parses the command and sends it to an **LLM (Groq/Llama-3)** with a localized prompt
-3. The AI generates 3 viral hooks, a 15–30 second video script, a caption, and hashtags — localized for the Ethiopian/Amharic-English TikTok audience
-4. Results are sent back to Telegram AND logged to **Google Sheets** automatically
-
-**Workflow 2 — Daily Digest (Scheduled):**
-- Runs on a cron schedule
-- Pulls all products logged that day from Google Sheets
-- Generates a consolidated daily performance summary and sends it to Telegram
+1. **Autonomous Research**: A specialized AI researcher scrapes the product URL and identifies 3 high-impact USPs and target audience pain points.
+2. **Multi-Agent Copywriting**: specialized agents generate viral TikTok hooks, a LinkedIn value post, and a YouTube Shorts script — all in a single run.
+3. **AI Media Production**: The system automatically generates a custom product hero image (Pollinations.ai) and a professional voiceover (ElevenLabs).
+4. **HITL Approval Gate**: The execution pauses and sends an interactive Telegram message to the admin. The admin can **✅ Approve**, **🔄 Regenerate**, or **❌ Reject** directly from Telegram.
+5. **Post-Approval Dispatch**: Approved content is automatically posted to a Telegram channel and logged in a persistent **Supabase** distribution queue.
+6. **Observability**: A dedicated monitoring workflow logs every run, status, and execution time to a live analytics dashboard.
 
 ### Technical Depth
-- **Telegram Bot API** integration — webhook-triggered, fully conversational
-- **Groq API (Llama-3)** for ultra-fast LLM inference
-- **Custom system prompt engineering** — the AI is instructed to produce localized content in a mix of Amharic and English (Ethiopic script supported)
-- **Google Sheets as a lightweight database** — append-on-trigger pattern
-- **Multi-workflow coordination** — two independent workflows share data via Google Sheets
-- **Scheduled triggers** alongside webhook triggers in the same project
-- **Docker deployment** ready with a provided `docker-compose.yml`
+- **Multi-Agent Orchestration** via Groq (Llama 3.3-70B) for zero-cost, high-speed reasoning.
+- **Relational Backend**: Uses Supabase (PostgreSQL) with 5 tables and strict Row Level Security (RLS) policies.
+- **Advanced Wait-Resume Logic**: Implements n8n's **Wait Node** with secure, signed signatures for the approval webhook.
+- **Modular Sub-Workflows**: Media generation and monitoring are isolated as independent, reusable sub-workflows.
+- **Automated Data Integrity**: Database-level UUID generation and check constraints for channels and status.
+- **Real-Time Observability**: Execution health is tracked in an `analytics` table for production-grade monitoring.
 
 ### Why This Is Impressive
-This project showcases the full breadth of n8n's real-world application: **real-time bots, AI content generation, scheduled jobs, external APIs, and persistent data storage** — all in one cohesive system. It also demonstrates product-thinking: building something a real user would actually pay for.
+While many build simple "AI to Sheets" flows, AuraEngine is a **full-scale autonomous factory**. It demonstrates mastery of multi-workflow communication, secure HITL gates, complex relational data modeling, and production-grade error handling/monitoring. It's an "Automation Architect" level project.
 
 ---
 
