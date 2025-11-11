@@ -24,7 +24,7 @@ Every project in this repository solves a *real business problem* — from an au
 | 1 | [Sentinel: Autonomous Multi-Agent RAG Engine](#1--sentinel-autonomous-multi-agent-rag-engine) | AI Agents, LangChain, Vector Stores, Supervisor Routing |
 | 2 | [Ethio-CRM Lifecycle Sync](#2--ethio-crm-lifecycle-sync) | GoHighLevel Webhooks, Supabase, AI Agent, Event-Driven Design |
 | 3 | [n8n Catalog Automation Engine](#3--n8n-catalog-automation-engine) | Web Scraping, Puppeteer, Shopify API, ETL Pipelines |
-| 4 | [n8n Content Pipeline](#4--n8n-content-pipeline) | Telegram Bot, OpenAI, Google Sheets, Multi-Workflow Orchestration |
+| 4 | [n8n Content Pipeline](#4--n8n-content-pipeline) | Telegram Bot, Groq (Llama 3), Supabase, Multi-Workflow Orchestration |
 
 ---
 
@@ -154,7 +154,7 @@ While many build simple "AI to Sheets" flows, AuraEngine is a **full-scale auton
 |---|---|
 | **n8n Core** | Webhooks, HTTP Request, Code nodes, IF/Switch, Error Triggers, Set, Merge, Function (legacy migration) |
 | **AI & LLM** | OpenAI, Groq (Llama-3), OpenRouter, AI Agent node, LangChain tool patterns, Prompt Engineering |
-| **Databases** | Supabase (PostgreSQL), Google Sheets, Vector Stores |
+| **Databases** | Supabase (PostgreSQL), Vector Stores |
 | **External APIs** | GoHighLevel, Shopify Admin API, Telegram Bot API, Groq API |
 | **DevOps** | Docker, docker-compose, Node.js microservices, Express.js, environment variable management |
 | **Architecture** | Multi-agent systems, event-driven design, ETL pipelines, webhook orchestration, scheduled automation |

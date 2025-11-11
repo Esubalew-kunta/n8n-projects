@@ -13,7 +13,7 @@ Most content pipelines are linear: input → AI → post. AuraEngine is differen
 | Dimension | Before (v1) | After — AuraEngine |
 |---|---|---|
 | AI Model | Single OpenAI call | 3 specialized Groq agents |
-| Database | Google Sheets | Supabase PostgreSQL (5 tables) |
+| Database | Basic Webhooks | Supabase PostgreSQL (5 tables) |
 | Media | Text only | AI images + AI voiceovers |
 | Approval | Auto-post | Telegram HITL inline keyboard |
 | Channels | TikTok only | YouTube · LinkedIn · Telegram · TikTok |
